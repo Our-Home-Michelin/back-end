@@ -9,7 +9,7 @@ likeCount : 좋아요 숫자 (공공API에 없다! 0으로 넣어둠)
 */
 
 import * as fs from 'fs';
-const jsonFile = fs.readFileSync('./recipe.json', 'utf8');
+const jsonFile = fs.readFileSync('static/recipe.json', 'utf8');
 const jsonData = JSON.parse(jsonFile);
 
 const recipeList = jsonData.COOKRCP01.row;

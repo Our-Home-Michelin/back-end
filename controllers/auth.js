@@ -1,35 +1,43 @@
-import User from '../models/user.js';
-import hashPassword from '../middlewares/hashpassword.js';
-import setToken from '../middlewares/token.js'
+import User from "../models/user.js";
+import hashPassword from "../middlewares/hashpassword.js";
+import generateToken from "../middlewares/token.js";
 
-
-export const login = (req, res) => {
-    try {
-        setToken(res, req.user);
-    } catch (err) {
-        res.status(500).send('로그인에 실패했습니다.');
-    }
-    res.redirect('/');
+export const login = (req, res, next) => {
+  try {
+    console.log(req.user);
+    const token = generateToken(req.user);
+    res
+      .cookie("t", token, {
+        httpOnly: true,
+        signed: true,
+      })
+      .send({ message: "로그인 성공" });
+  } catch (err) {
+    err.status = 500;
+    next(err);
+  }
 };
 
-export const join = async (req, res) => {
-    try{
-        const { email, name, password } = req.body;
-        const existingUser = await User.findOne({ email }); 
-        const hashedPassword = await hashPassword(password);
+export const join = async (req, res, next) => {
+  try {
+    const { email, nickName, password } = req.body;
+    const existingUser = await User.findOne({ email });
 
-        if (!existingUser) {
-            const user = await User.create({
-                email,
-                name,
-                password: hashedPassword,
-            });
-            return res.json({ message: '회원가입이 성공적으로 완료되었습니다.'});
-        } else {
-            return res.status(400).json('이미 존재하는 email 입니다.');
-        }
-    } catch (err) {
-        console.log(err);
-        res.status(500).send('회원가입 중 오류가 발생했습니다.')
+    if (existingUser) {
+      const error = new Error("이미 존재하는 email입니다.");
+      error.status = 400;
+      throw error;
     }
-}
+
+    const hashedPassword = await hashPassword(password);
+    const user = await User.create({
+      email,
+      nickName,
+      password: hashedPassword,
+    });
+
+    res.json({ message: "회원가입이 성공적으로 완료되었습니다." });
+  } catch (error) {
+    next(error);
+  }
+};

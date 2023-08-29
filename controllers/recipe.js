@@ -1,6 +1,7 @@
 import Recipe from "../models/recipe.js";
 import User from "../models/user.js";
 import Editor from "../models/editor.js";
+import LikedUsers from "../models/likedUsers.js";
 
 // 전체 레시피 조회
 export const getAllRecipes = async (req, res) => {
@@ -38,6 +39,7 @@ export const getRecipe = async (req, res) => {
       "writer",
       "nickName"
     );
+
     if (!recipe) {
       // 해당 레시피가 없는 경우
       return res.status(404).json({ message: "레시피를 찾을 수 없습니다 :(" });
@@ -285,3 +287,66 @@ export const deleteRecipe = async (req, res) => {
     res.status(500).json({ message: "문제가 발생했습니다." });
   }
 };
+
+// 사용자가 레시피 상세페이지에 접근했을때 좋아요버튼을 눌렀는지 확인.
+// 파라미터 값: 레시피id
+// 결과값 : 게시물에 좋아요 눌렀으면 True 안눌렀으면 False
+export const hitcheck = async (req, res) => {
+  const recipeId = req.params.id;
+  // token decode
+  let cookies = req.headers.cookie.split("; ").map((el) => el.split("="));
+  let cookieObj = {};
+  cookies.forEach((item) => {
+    cookieObj[item[0]] = item[1];
+  });
+  if ("t" in cookieObj) {
+    // 로그인 된 상태
+    var base64Payload = cookieObj['t'].split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE
+    var payload = Buffer.from(base64Payload, 'base64');
+    var result = JSON.parse(payload.toString());
+    const loginEmail = result.email;
+    const a = await LikedUsers.find({ _id: recipeId, users: loginEmail });
+
+    let likeCount = a.length;
+    let isHit = a.length > 0;
+
+    //console.log("좋아요 갯수: " + likeCount);
+    //console.log("좋아요 여부: " + isHit);
+  } else {
+
+  }
+}
+
+// 하트 눌렀을때 사용자 likedUsers에 저장. 미구현
+// export const likeHit = async (req, res) => {
+//   const recipeId = req.params.id;
+//   // token decode
+//   const token = req.headers.cookie.split(" ")[2].slice(2);
+//   var base64Payload = token.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE
+//   var payload = Buffer.from(base64Payload, 'base64');
+//   var result = JSON.parse(payload.toString());
+//   const loginEmail = result.email;
+//   const a = await LikedUsers.find({ _id: recipeId, users: loginEmail });
+//   const isHit = a.length > 0;
+
+//   if (isHit) {
+//     LikedUsers.updateOne(
+//       { _id: recipeId },
+//       {
+//         $push: { users: loginEmail },
+//       }
+//     )
+//   } else {
+//     LikedUsers.updateOne(
+//       { _id: recipeId },
+//       {
+//         $pull: { users: loginEmail },
+//       }
+//     )
+//   }
+// }
+
+//지우 :  레시피 좋아요 기능
+export const likeCount12 = async (req, res) => {
+
+}

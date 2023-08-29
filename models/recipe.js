@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import User from "./user.js";
 
+
 const Schema = mongoose.Schema;
 
 const ingredientSchema = new Schema({
@@ -19,5 +20,6 @@ const recipeSchema = new Schema({
   writer: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   createdDate: { type: Date, default: Date.now },
 });
+
 
 export default mongoose.model("Recipe", recipeSchema);

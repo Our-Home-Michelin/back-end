@@ -33,4 +33,7 @@ recipeRouter.delete("/api/recipes/:id", recipeController.deleteRecipe);
 
 recipeRouter.delete("/api/:id/image", recipeController.deleteRecipeImage);
 
+//🐹
+// recipeRouter.post("/api/recipes/:id", recipeController.likeCount);
+
 export default recipeRouter;

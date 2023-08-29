@@ -12,6 +12,7 @@ import authRoutes from "./routes/auth.js";
 import { sendVerificationCode, verifyCode } from "./controllers/mailer.js";
 import recipeRouter from "./routes/recipe.js";
 import fridgeRouter from "./routes/fridge.js";
+import editorRouter from "./routes/editor.js";
 
 dotenv.config();
 console.log(process.env.JWT_SECRET);
@@ -31,13 +32,31 @@ app.post("/recipes/upload-image", upload.single("image"), (req, res) => {
   res.json({ imageUrl });
 });
 
+app.use(authRoutes);
+app.use(userRoutes);
+app.use(recipeRouter);
+app.use(fridgeRouter);
+app.use(editorRouter);
+
+app.use((error, req, res, next) => {
+  console.error(error);
+  const status = error.status ?? 500;
+  res.status(status).json({
+    error: error.message,
+    data: null,
+  });
+});
+
+//
+app.post("/upload", upload.single("uploadRecipeImg"), function (req, res) {
+  res.send("이미지 multer 서버 업로드 완료");
+});
+//
+
 const { MONGODB_USERNAME, MONGODB_PASSWORD, MONGODB_CLUSTER, MONGODB_DB_NAME } =
   process.env;
 
-//const mongoDB_URI = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_CLUSTER}/`;
-
-const mongoDB_URI =
-  "mongodb+srv://argandd34:elice123123%21@cluster0.ivnuzfd.mongodb.net/";
+const mongoDB_URI = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_CLUSTER}/`;
 
 const startServer = async () => {
   try {
@@ -56,17 +75,3 @@ const startServer = async () => {
 };
 
 startServer();
-
-app.use(authRoutes);
-app.use(userRoutes);
-app.use(recipeRouter);
-app.use(fridgeRouter);
-
-app.use((error, req, res, next) => {
-  console.error(error);
-  const status = error.status ?? 500;
-  res.status(status).json({
-    error: error.message,
-    data: null,
-  });
-});

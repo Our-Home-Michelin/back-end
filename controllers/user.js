@@ -25,7 +25,11 @@ export const updateUser = async (req, res) => {
       userUpdateData.password = hashedPassword;
     }
 
-    const updatedUser = await User.findByIdAndUpdate(req.user._id, userUpdateData, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      userUpdateData,
+      { new: true }
+    );
 
     if (!updatedUser) throw Error("존재하지 않는 회원입니다.");
 

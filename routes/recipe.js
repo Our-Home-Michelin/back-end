@@ -34,8 +34,6 @@ recipeRouter.post(
 
 recipeRouter.get("/api/fivestar-recipes", recipeController.getFiveStarRecipes);
 
-recipeRouter.get("/api/editors-recipes", recipeController.getEditorsRecipes);
-
 recipeRouter.post(
   "/api/recipes",
   upload.single("uploadRecipeImg"),
@@ -44,10 +42,6 @@ recipeRouter.post(
   recipeController.writeRecipe
 );
 
-recipeRouter.put("/api/recipes/:id", recipeController.updateRecipe);
-
 recipeRouter.delete("/api/recipes/:id", recipeController.deleteRecipe);
-
-recipeRouter.delete("/api/:id/image", recipeController.deleteRecipeImage);
 
 export default recipeRouter;

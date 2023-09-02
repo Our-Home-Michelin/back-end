@@ -1,14 +1,13 @@
 import Recipe from "../models/recipe.js";
 import User from "../models/user.js";
 import Editor from "../models/editor.js";
-import path from "path";
 
 export const getAllRecipes = async (req, res) => {
   try {
-    const defaultLimit = await Recipe.countDocuments(); // defaultLimit - 전체 레시피 수
+    const defaultLimit = await Recipe.countDocuments();
 
-    let offset = 0; // offset: 시작하는 숫자
-    let limit = defaultLimit; // limit: 끝나는 숫자
+    let offset = 0;
+    let limit = defaultLimit;
 
     const tmpOffset = parseInt(req.query.offset);
     if (tmpOffset >= 0) {
@@ -153,15 +152,16 @@ export const writeRecipe = async (req, res) => {
     const newIngredients = JSON.parse(ingredients);
     const newProcess = JSON.parse(process);
 
-    if (!req.file) {
+    if (req.file) {
       const imgFileData = {
         path: req.file.path,
         name: req.file.originalname,
         ext: req.file.mimetype.split("/")[1],
       };
+
       reqImageUrl = `/${imgFileData.path}`;
     } else {
-      reqImageUrl = imageUrl;
+      reqImageUrl = "";
     }
 
     const newRecipe = await Recipe.create({

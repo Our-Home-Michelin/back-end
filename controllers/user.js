@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 
 export const getUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("-password");
+    const user = await User.findById(req.user._id);
     if (!user) throw Error("존재하지 않는 회원입니다.");
     res.json(user);
   } catch (err) {
@@ -15,6 +15,18 @@ export const getUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { nickName, email, password } = req.body;
+
+    let profileImageURL = req.user.profileImageURL;
+    if (req.file) {
+      const imgFileData = {
+        path: req.file.path,
+        name: req.file.originalname,
+        ext: req.file.mimetype.split("/")[1],
+      };
+
+      profileImageURL = `/${imgFileData.path}`;
+    }
+
     let userUpdateData = {};
 
     if (nickName) userUpdateData.nickName = nickName;
@@ -27,7 +39,7 @@ export const updateUser = async (req, res) => {
 
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
-      userUpdateData,
+      { ...userUpdateData, profileImageURL },
       { new: true }
     );
 
@@ -42,7 +54,9 @@ export const updateUser = async (req, res) => {
 
 export const deleteUser = async (req, res, next) => {
   try {
+    console.log(req);
     const user = await User.findById(req.user._id);
+    console.log(user);
 
     if (!user) throw Error("존재하지 않는 회원입니다.");
 
